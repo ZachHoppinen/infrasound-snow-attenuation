@@ -1,4 +1,5 @@
-/receipts
-/data
-/cube2mseed_install
+receipts/
+data/
+cube2mseed_install
 *.DS_Store
+array_data/
