@@ -3,3 +3,5 @@ data/
 cube2mseed_install
 *.DS_Store
 array_data/
+results/
+logs/
