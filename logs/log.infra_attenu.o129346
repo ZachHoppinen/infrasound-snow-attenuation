@@ -1,0 +1,4 @@
+Starting snow layer attenuation analysis...
+Creating 48-process pool
+Running pooled process
+slurmstepd: error: *** JOB 129346 ON cpu119 CANCELLED AT 2022-06-12T18:35:06 ***
