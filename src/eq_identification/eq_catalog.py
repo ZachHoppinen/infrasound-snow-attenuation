@@ -2,9 +2,6 @@ import numpy as np
 import pandas as pd
 import geopandas as gpd
 import matplotlib.pyplot as plt
-from mpl_toolkits.axes_grid1.inset_locator import inset_axes
-import matplotlib.colors as colors
-import contextily as cx
 from os.path import join
 import pickle
 from shapely.geometry import Point, box
@@ -70,6 +67,6 @@ for i, r in tqdm(res.iterrows(), total = len(res)):
                         res.loc[i, 'selected'] = 0
                 except ValueError:
                     pass
-# res.selected[np.isnan(res.selected), 'selected'] = 0
+res.loc[np.isnan(res.selected), 'selected'] = 0
 
 res.to_csv('/bsuscratch/zacharykeskinen/data/infrasound/eq_catalog/selected.csv')
