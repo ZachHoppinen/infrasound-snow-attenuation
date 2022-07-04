@@ -1,0 +1,7 @@
+sbatch /path/to/slurm
+
+scancel (job number)
+
+scontrol show job (job number)
+
+squeue
