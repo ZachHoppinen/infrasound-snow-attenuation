@@ -1,0 +1,12 @@
+#!/bin/bash
+#SBATCH -J psd_calc # job name
+#SBATCH -o /bsuhome/zacharykeskinen/infrasound/logs/log.%x.o%j # output and error file name (%j expands to jobID)
+#SBATCH -n 1 # total number of tasks requested
+#SBATCH -N 1 # number of nodes you want to run on
+#SBATCH -p bsudfq # queue (partition)
+#SBATCH -t 03:00:00 # run time (hh:mm:ss) - 1 hour in this example.
+
+eval "$(conda shell.bash hook)"
+conda activate infra
+
+python /bsuhome/zacharykeskinen/infrasound/src/eq_analysis/PSD.py
