@@ -7,6 +7,13 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 data_dir = '/home/zacharykeskinen/Documents/infrasound/array_data'
+data_dir = '/bsuscratch/zacharykeskinen/data/infrasound/array_data'
+
+snotel_fp = '/bsuscratch/zacharykeskinen/data/infrasound/snotel/banner_snotel_results.csv'
+
+snotel = pd.read_csv(snotel_fp, comment='#', index_col=['Date'])
+for c in snotel.columns:
+    snotel[c] = snotel[c].astype('f4')
 
 arrays = glob(join(data_dir, '*'))
 fps = {}
@@ -34,9 +41,10 @@ for date in dates:
                 if height_parse(f):
                     height_fps[height_parse(f)] = f                    
             day_fps.update(height_fps)
+    day_fps['snotel'] = snotel.loc[date]
     res[date] = day_fps
 
-with open('/home/zacharykeskinen/Documents/infrasound/array_data/merged/all_days', 'wb') as f:
+with open(join(data_dir, 'merged/all_days'), 'wb') as f:
     pickle.dump(res, f)
 
 upper_dates = np.unique([basename(d).split('_')[0] for d in fps['upper']])
@@ -53,7 +61,8 @@ for date in dates:
                 if height_parse(f):
                     height_fps[height_parse(f)] = f                    
             day_fps.update(height_fps)
+    day_fps['snotel'] = snotel.loc[date]
     res[date] = day_fps
 
-with open('/home/zacharykeskinen/Documents/infrasound/array_data/merged/full_days', 'wb') as f:
+with open(join(data_dir, 'merged/full_days'), 'wb') as f:
     pickle.dump(res, f)

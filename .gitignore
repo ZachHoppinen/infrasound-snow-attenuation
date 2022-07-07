@@ -5,3 +5,4 @@ cube2mseed_install
 array_data/
 results/
 logs/
+*cache/
