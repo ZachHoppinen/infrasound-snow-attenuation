@@ -12,6 +12,7 @@ from multiprocessing import Pool, cpu_count
 from datetime import datetime
 
 from filtering import freq_filt
+from correlate import zero_lag_correlate
 
 print('Loading dataframes')
 canyon = pd.read_csv('/bsuscratch/zacharykeskinen/data/infrasound/snotel/canyon_wx.csv', comment = '#', parse_dates=['Date_Time'], index_col = ['Date_Time'])
@@ -56,14 +57,28 @@ def process(day):
                         res['sd_delta'] = [sd - h]
                         res['wind'] = [wind_speed]
                         arr = freq_filt(pd.read_parquet(fp)[s:e].values.ravel(), 1, kind = 'highpass')
-                        power = np.sum(arr**2)/arr.size
+                        arr = arr[60*60*sps]
+                        # power = np.sum(arr**2)/arr.size
+                        power = welch(arr, fs = sps)
                         res['power'] = [power]
+                        if 2 in fps.keys() and h !=  2:
+                            res['cor'] = [np.nanmean(zero_lag_correlate(fps[2],fps[h], wind_s = 1))]
+                        elif 0.33 in fps.keys() and h!= 0.33:
+                            res['cor'] = [np.nanmean(zero_lag_correlate(fps[0.33],fps[h], wind_s = 1))]
+                        elif 1.33 in fps.keys() and h != 1.33:
+                            res['cor'] = [np.nanmean(zero_lag_correlate(fps[1.33],fps[h], wind_s = 1))]
+                        elif 1 in fps.keys() and h != 1:
+                            res['cor'] = [np.nanmean(zero_lag_correlate(fps[1],fps[h], wind_s = 1))]
+                        else:
+                            res['cor'] = [np.nan]
                         df = pd.DataFrame(res)
                         full = pd.concat([full, df])
         except ValueError as e:
             print(e)
+        except IndexError as e:
+            print(e)
     if full.size > 0:
-        with open(join(tmp_dir, d.strftime('%Y-%m-%d')), 'wb') as f:
+        with open(join(tmp_dir, d.strftime('%Y-%m-%d')+'.pkl'), 'wb') as f:
             pickle.dump(full, f)
 
 
@@ -81,7 +96,7 @@ for f in glob(join(tmp_dir, '*')):
         df = pickle.load(f)
     res = pd.concat([res, df])
 
-with open(join(result_dir, 'windv1.pkl'), 'wb') as f:
+with open(join(result_dir, 'windv2.pkl'), 'wb') as f:
     pickle.dump(res, f)
 
 end_time = datetime.now()
