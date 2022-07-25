@@ -1,5 +1,5 @@
 {
-    "notebook.displayOrder": [
-        "image/png"
+    "python.analysis.extraPaths": [
+        "/bsuhome/zacharykeskinen/infrasound/src/functions"
     ]
 }

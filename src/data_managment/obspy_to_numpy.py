@@ -29,6 +29,9 @@ def main():
         array_fps = sorted([f for f in fps if ext in f])
         for i, fp in enumerate(array_fps):
             tr = obspy.read(fp)[0]
+            # tr.detrend("linear")
+            arr = np.array(tr.data * ac_calib)
+            t = [datetime.fromtimestamp(t) for t in tr.times("timestamp")]
             stats = tr.stats
             channel = int(stats.channel.replace('p','')) + 1
             out_fp = join(array_dir, f'{stats.starttime.date}_c{channel}.parq')
