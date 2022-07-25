@@ -14,7 +14,7 @@ from datetime import datetime
 
 def main():
     ac_calib = 8.2928e-05
-    name_dic = {'be4':'lower','a3m':'upper','ad8':'horizontal'}
+    name_dic = {'be4':'lower','a3m':'upper','ad8':'horizontal','ada':'horizontal_2'}
     local_data_dir = '/home/zacharykeskinen/Documents/infrasound/data/banner/infrasound/processed'
     target_dir = '/home/zacharykeskinen/Documents/infrasound/array_data'
     assert exists(target_dir)
@@ -29,16 +29,18 @@ def main():
         array_fps = sorted([f for f in fps if ext in f])
         for i, fp in enumerate(array_fps):
             tr = obspy.read(fp)[0]
-            tr.detrend("linear")
-            arr = np.array(tr.data * ac_calib)
-            t = [datetime.fromtimestamp(t) for t in tr.times("timestamp")]
             stats = tr.stats
-            res = pd.DataFrame(arr, index = t, columns = ['pa'])
-            res.index = res.index.tz_localize('US/Mountain').tz_convert('UTC')
-
-            ## Parquet
             channel = int(stats.channel.replace('p','')) + 1
-            write(join(array_dir, f'{stats.starttime.date}_c{channel}.parq'), res, compression = 'GZIP')
+            out_fp = join(array_dir, f'{stats.starttime.date}_c{channel}.parq')
+            if not exists(out_fp):
+                tr.detrend("linear")
+                arr = np.array(tr.data * ac_calib)
+                t = [datetime.fromtimestamp(t) for t in tr.times("timestamp")]
+                res = pd.DataFrame(arr, index = t, columns = ['pa'])
+                res.index = res.index.tz_localize('US/Mountain').tz_convert('UTC')
+
+                ## Parquet
+                write(out_fp, res, compression = 'GZIP')
             if i%10 == 0:
                 print(f'Completed {i} of {len(array_fps)}')
 
