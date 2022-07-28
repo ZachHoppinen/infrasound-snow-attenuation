@@ -14,6 +14,9 @@ from datetime import datetime
 from filtering import freq_filt
 from correlate import zero_lag_correlate
 
+import warnings
+warnings.filterwarnings("ignore", category=RuntimeWarning) 
+
 print('Loading dataframes')
 canyon = pd.read_csv('/bsuscratch/zacharykeskinen/data/infrasound/snotel/canyon_wx.csv', comment = '#', parse_dates=['Date_Time'], index_col = ['Date_Time'])
 units = canyon.iloc[0]
@@ -40,7 +43,7 @@ with open(join(data_dir, 'merged/all_days'), 'rb') as f:
 sps = 200
 
 print('Starting analysis...')
-h_actual = {0.33:0.2,0.66:0.55,1:0.85,1.33:1.2,2:2}
+h_actual = {0.33:0.15,0.66:0.5,1:0.8,1.33:1.15,2:2}
 def process(day):
     full = pd.DataFrame()
     d, fps = day
@@ -62,17 +65,18 @@ def process(day):
                         # power = np.sum(arr**2)/arr.size
                         power = welch(arr, fs = sps)
                         res['power'] = [power]
+                        res['broad_power'] = np.sum(arr**2)
                         if 2 in fps.keys() and h !=  2:
                             second_arr = freq_filt(pd.read_parquet(fps[2])[s:e].values.ravel(), 1, kind = 'highpass')[:60*60*sps]
                             res['cor'] = [np.nanmean(zero_lag_correlate(second_arr,arr, wind_s = 1))]
                         elif 0.33 in fps.keys() and h != 0.33:
-                            d_arr = freq_filt(pd.read_parquet(fps[0.33])[s:e].values.ravel(), 1, kind = 'highpass')[:60*60*sps]
+                            second_arr = freq_filt(pd.read_parquet(fps[0.33])[s:e].values.ravel(), 1, kind = 'highpass')[:60*60*sps]
                             res['cor'] = [np.nanmean(zero_lag_correlate(second_arr,arr, wind_s = 1))]
                         elif 1.33 in fps.keys() and h != 1.33:
-                            d_arr = freq_filt(pd.read_parquet(fps[1.33])[s:e].values.ravel(), 1, kind = 'highpass')[:60*60*sps]
+                            second_arr = freq_filt(pd.read_parquet(fps[1.33])[s:e].values.ravel(), 1, kind = 'highpass')[:60*60*sps]
                             res['cor'] = [np.nanmean(zero_lag_correlate(second_arr,arr, wind_s = 1))]
                         elif 1 in fps.keys() and h != 1:
-                            d_arr = freq_filt(pd.read_parquet(fps[1])[s:e].values.ravel(), 1, kind = 'highpass')[:60*60*sps]
+                            second_arr = freq_filt(pd.read_parquet(fps[1])[s:e].values.ravel(), 1, kind = 'highpass')[:60*60*sps]
                             res['cor'] = [np.nanmean(zero_lag_correlate(second_arr,arr, wind_s = 1))]
                         else:
                             res['cor'] = [np.nan]
@@ -87,6 +91,8 @@ def process(day):
     if full.size > 0:
         with open(join(tmp_dir, d.strftime('%Y-%m-%d')+'.pkl'), 'wb') as f:
             pickle.dump(full, f)
+        out_str = d.strftime('%Y-%m-%d')
+        print(f'finished {out_str}')
 
 
 # loc_old = None
