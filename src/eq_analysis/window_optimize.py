@@ -24,8 +24,8 @@ sps = 200
 
 ############################### Welch #####################################
 # Get welch earhtquake averages
-window_start = [0, 3, 5, 10]
-windows_end = [5,10,15,30]
+window_start = [0, 3, 5, 7, 10, 15, 30]
+windows_end = [5,10,15,30, 45]
 for start in window_start:
     for end in windows_end:
         if start >= end:
@@ -34,12 +34,12 @@ for start in window_start:
         n = 0
         avg_Pxx = np.array([])
         for i, r in res[res.selected == 1].iterrows():
-            if i == 0:
+            if i == i:
                 dt = pd.to_datetime(r.time).strftime('%Y-%m-%d')
                 day = days[dt]
                 sig = {}
                 s = pd.to_datetime(r.time) + pd.Timedelta(f'{start} second')
-                e = s + pd.Timedelta(f'{end} second')
+                e = pd.to_datetime(r.time) + pd.Timedelta(f'{end} second')
                 try:
                     if 0.33 in day.keys() and 1.33 in day.keys() and day['snotel']['Snow Depth (cm) Start of Day Values'] > 133:
                         for name, fp in day.items():
@@ -47,7 +47,6 @@ for start in window_start:
                                 arr = freq_filt(pd.read_parquet(fp)[s:e].values.ravel(), 1, kind = 'highpass')
                                 arr = arr[:2000]
                                 f, Pxx = welch(arr, sps, scaling = 'density', window = 'hann')
-                                # Pxx = filtfilt([1,1,1,1,1],5, Pxx)
                                 sig[name] = Pxx
                         df = pd.DataFrame(sig)
                         df.index = f
