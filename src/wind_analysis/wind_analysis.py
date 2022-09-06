@@ -49,13 +49,14 @@ def process(day):
     d, fps = day
     winds = canyon.loc[pd.to_datetime(d + 'T00:00:00Z'):pd.to_datetime(d + 'T23:59:00Z'), 'wind_speed_set_1']
     d = pd.to_datetime(d)
+    print(d)
     if d < pd.to_datetime('2022-04-30'):
         sd = snotel.loc[d, 'Snow Depth (cm) Start of Day Values']/100
         try:
             for s, wind_speed in winds.iteritems():
                 e = s + pd.Timedelta('1 hour')
                 for h, fp in fps.items():
-                    if h != 'snotel' and h != 2:
+                    if h != 'snotel':
                         h_act = h_actual[h]
                         res = {}
                         res['sd_delta'] = [sd - h_act] # positive values are under the snowpack 1.33 (sd) - 0.2 (h) = 1.13
@@ -66,6 +67,7 @@ def process(day):
                         power = welch(arr, fs = sps)
                         res['power'] = [power]
                         res['broad_power'] = np.sum(arr**2)
+                        res['h'] = h
                         if 2 in fps.keys() and h !=  2:
                             second_arr = freq_filt(pd.read_parquet(fps[2])[s:e].values.ravel(), 1, kind = 'highpass')[:60*60*sps]
                             res['cor'] = [np.nanmean(zero_lag_correlate(second_arr,arr, wind_s = 1))]
@@ -104,13 +106,15 @@ pool = Pool()                         # Create a multiprocessing Pool
 print(f'Using {cpu_count()} cpus')
 pool.map(process, iter(days.items()))
 
-res = pd.DataFrame()
+super_x = []
 for f in glob(join(tmp_dir, '*')):
     with open(f, 'rb') as f:
         df = pickle.load(f)
-    res = pd.concat([res, df])
+    super_x.append(df)
 
-with open(join(result_dir, 'windv2.pkl'), 'wb') as f:
+res = pd.concat(super_x, ignore_index=True)
+
+with open(join(result_dir, 'windv3.pkl'), 'wb') as f:
     pickle.dump(res, f)
 
 end_time = datetime.now()
