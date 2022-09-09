@@ -105,13 +105,13 @@ for i, r in res[res.selected == 1].iterrows():
         day = days[dt]
         sig = {}
         s = pd.to_datetime(r.time)
-        e = s + pd.Timedelta('10 second')
+        e = s + pd.Timedelta('7 second')
         try:
             if 0.33 in day.keys() and 1.33 in day.keys() and day['snotel']['Snow Depth (cm) Start of Day Values'] > 133:
                 for name, fp in day.items():
                     if name != 'snotel':
                         arr = freq_filt(pd.read_parquet(fp)[s:e].values.ravel(), 1, kind = 'highpass')
-                        arr = arr[:2000]
+                        arr = arr[:7*200]
                         f, Pxx = welch(arr, sps, scaling = 'density', window = 'hann')
                         # Pxx = filtfilt([1,1,1,1,1],5, Pxx)
                         sig[name] = Pxx
@@ -132,43 +132,43 @@ avg_Pxx = avg_Pxx/n
 with open(join(result_dir, 'all_welchs.pkl'), 'wb') as f:
     pickle.dump(all_psds, f)
 
-with open(join(result_dir, 'avg_welch.pkl'), 'wb') as f:
+with open(join(result_dir, 'avg_welch_writ.pkl'), 'wb') as f:
     pickle.dump(avg_Pxx, f)
 
-# # Get same for pre-earthquake periods
-# n = 0
-# pre_avg_Pxx = np.array([])
-# for i, r in res[res.selected == 1].iterrows():
-#     if i == i:
-#         dt = pd.to_datetime(r.time).strftime('%Y-%m-%d')
-#         day = days[dt]
-#         sig = {}
-#         pe = pd.to_datetime(r.time)
-#         ps = pe - pd.Timedelta('10 second')
-#         try:
-#             if 0.33 in day.keys() and 1.33 in day.keys() and day['snotel']['Snow Depth (cm) Start of Day Values'] > 133:
-#                 for name, fp in day.items():
-#                     if name != 'snotel':
-#                         pre = freq_filt(pd.read_parquet(fp)[ps:pe].values.ravel(), 1, kind = 'highpass')
-#                         pre = pre[:2000]
-#                         f, pre_Pxx = welch(pre, sps, scaling = 'density', window = 'hann') # nperseg = 1000?
-#                         # pre_Pxx = filtfilt([1,1,1,1,1],5, pre_Pxx)
-#                         sig[name] = pre_Pxx
-#                 df = pd.DataFrame(sig)
-#                 df.index = f
-#                 if pre_avg_Pxx.size == 0:
-#                     pre_avg_Pxx = df
-#                 else:
-#                     pre_avg_Pxx = pre_avg_Pxx + df
-#                     n +=1  
-#         except ValueError as e:
-#             print(dt)
-#             print(e)
+# Get same for pre-earthquake periods
+n = 0
+pre_avg_Pxx = np.array([])
+for i, r in res[res.selected == 1].iterrows():
+    if i == i:
+        dt = pd.to_datetime(r.time).strftime('%Y-%m-%d')
+        day = days[dt]
+        sig = {}
+        pe = pd.to_datetime(r.time)
+        ps = pe - pd.Timedelta('7 second')
+        try:
+            if 0.33 in day.keys() and 1.33 in day.keys() and day['snotel']['Snow Depth (cm) Start of Day Values'] > 133:
+                for name, fp in day.items():
+                    if name != 'snotel':
+                        pre = freq_filt(pd.read_parquet(fp)[ps:pe].values.ravel(), 1, kind = 'highpass')
+                        pre = pre[:7*200]
+                        f, pre_Pxx = welch(pre, sps, scaling = 'density', window = 'hann') # nperseg = 1000?
+                        # pre_Pxx = filtfilt([1,1,1,1,1],5, pre_Pxx)
+                        sig[name] = pre_Pxx
+                df = pd.DataFrame(sig)
+                df.index = f
+                if pre_avg_Pxx.size == 0:
+                    pre_avg_Pxx = df
+                else:
+                    pre_avg_Pxx = pre_avg_Pxx + df
+                    n +=1  
+        except ValueError as e:
+            print(dt)
+            print(e)
 
-# pre_avg_Pxx = pre_avg_Pxx/n
+pre_avg_Pxx = pre_avg_Pxx/n
 
-# with open(join(result_dir, 'pre_avg_welch.pkl'), 'wb') as f:
-#     pickle.dump(pre_avg_Pxx, f)    
+with open(join(result_dir, 'pre_avg_welch_writ.pkl'), 'wb') as f:
+    pickle.dump(pre_avg_Pxx, f)    
 
 ################################ Welch- ALL EARTHQUAKES!!! #####################################
 ## Get welch earhtquake averages

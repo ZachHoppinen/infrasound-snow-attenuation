@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH -J psd_calc # job name
+#SBATCH -J 7sec_psd_calc # job name
 #SBATCH -o /bsuhome/zacharykeskinen/infrasound/logs/log.%x.o%j # output and error file name (%j expands to jobID)
 #SBATCH -n 1 # total number of tasks requested
 #SBATCH -N 1 # number of nodes you want to run on
