@@ -69,4 +69,11 @@ for i, r in tqdm(res.iterrows(), total = len(res)):
                     pass
 res.loc[np.isnan(res.selected), 'selected'] = 0
 
+res.loc[:, 'analyze'] = 0
+for i, r in res[res.selected == 1].iterrows():
+    dt = pd.to_datetime(r.time).strftime('%Y-%m-%d')
+    day = days[dt]
+    if day['snotel']['Snow Depth (cm) Start of Day Values'] > 133:
+        res.loc[i, 'analyze'] = 1
+
 res.to_csv('/bsuscratch/zacharykeskinen/data/infrasound/eq_catalog/selected.csv')
