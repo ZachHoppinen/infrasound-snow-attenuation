@@ -73,7 +73,7 @@ res.loc[:, 'analyze'] = 0
 for i, r in res[res.selected == 1].iterrows():
     dt = pd.to_datetime(r.time).strftime('%Y-%m-%d')
     day = days[dt]
-    if day['snotel']['Snow Depth (cm) Start of Day Values'] > 133:
+    if day['snotel']['Snow Depth (cm) Start of Day Values'] > 133 and 0.33 in day.keys() and 1.33 in day.keys():
         res.loc[i, 'analyze'] = 1
 res.loc[res.id == 'mb80539984', 'analyze'] = 0
 res.loc[res.id == 'us6000h3wh', 'analyze'] = 0
