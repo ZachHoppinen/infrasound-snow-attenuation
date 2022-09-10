@@ -11,7 +11,7 @@ import seaborn as sns
 from filtering import freq_filt
 
 banner_coords = (44.3, -115.233)
-res = pd.read_csv('/bsuscratch/zacharykeskinen/data/infrasound/eq_catalog/selected_v2.csv')
+res = pd.read_csv('/bsuscratch/zacharykeskinen/data/infrasound/eq_catalog/selected_v3.csv')
 from shapely import wkt
 res['geometry'] = res['geometry'].apply(wkt.loads)
 gdf = gpd.GeoDataFrame(res, geometry = 'geometry', crs = 'EPSG:4326')
@@ -99,7 +99,7 @@ sps = 200
 n = 0
 avg_Pxx = np.array([])
 all_psds = {}
-for i, r in res[res.selected == 1].iterrows():
+for i, r in res[res.analyze == 1].iterrows():
     if i == i:
         dt = pd.to_datetime(r.time).strftime('%Y-%m-%d')
         day = days[dt]
@@ -132,13 +132,13 @@ avg_Pxx = avg_Pxx/n
 with open(join(result_dir, 'all_welchs.pkl'), 'wb') as f:
     pickle.dump(all_psds, f)
 
-with open(join(result_dir, 'avg_welch_writ.pkl'), 'wb') as f:
+with open(join(result_dir, 'avg_welch_writv2.pkl'), 'wb') as f:
     pickle.dump(avg_Pxx, f)
 
 # Get same for pre-earthquake periods
 n = 0
 pre_avg_Pxx = np.array([])
-for i, r in res[res.selected == 1].iterrows():
+for i, r in res[res.analyze == 1].iterrows():
     if i == i:
         dt = pd.to_datetime(r.time).strftime('%Y-%m-%d')
         day = days[dt]
@@ -167,7 +167,7 @@ for i, r in res[res.selected == 1].iterrows():
 
 pre_avg_Pxx = pre_avg_Pxx/n
 
-with open(join(result_dir, 'pre_avg_welch_writ.pkl'), 'wb') as f:
+with open(join(result_dir, 'pre_avg_welch_writv2.pkl'), 'wb') as f:
     pickle.dump(pre_avg_Pxx, f)    
 
 ################################ Welch- ALL EARTHQUAKES!!! #####################################

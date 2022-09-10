@@ -75,5 +75,8 @@ for i, r in res[res.selected == 1].iterrows():
     day = days[dt]
     if day['snotel']['Snow Depth (cm) Start of Day Values'] > 133:
         res.loc[i, 'analyze'] = 1
+res.loc[res.id == 'mb80539984', 'analyze'] = 0
+res.loc[res.id == 'us6000h3wh', 'analyze'] = 0
+res.loc[res.id == 'us7000gibx', 'analyze'] = 0
 
-res.to_csv('/bsuscratch/zacharykeskinen/data/infrasound/eq_catalog/selected.csv')
+res.to_csv('/bsuscratch/zacharykeskinen/data/infrasound/eq_catalog/selected_v3.csv')
