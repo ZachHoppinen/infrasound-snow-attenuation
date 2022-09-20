@@ -42,6 +42,7 @@ for t1 in tqdm(np.arange(start = a.index.min(), stop = a.index.max() - pd.Timede
     for c1, c2 in combinations(sub.columns, 2):
         c, l = norm_correlate(sub[c1], sub[c2])
         if np.max(c) > 0.7:
+            plt.figure()
             plt.plot(l, abs(c))
             name = f'{t1}_{c1}and{c2}'
             name = name.replace(' ','-')
