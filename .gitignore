@@ -6,3 +6,6 @@ array_data/
 results/
 logs/
 *cache/
+cubetools
+cubtools/*
+music
