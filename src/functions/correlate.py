@@ -40,3 +40,13 @@ def zero_lag_correlate(arr1, arr2, wind_s, sps = 200):
         out[i] = corrcoeff_1d(arr1[i:i+lcl], arr2[i:i+lcl])
 
     return out
+
+from scipy.signal import correlate, correlation_lags
+from filtering import freq_filt
+
+def norm_correlate(arr1, arr2):
+    arr1 = freq_filt(arr1, 1, "highpass")
+    arr2 = freq_filt(arr2, 1, "highpass")
+    c = correlate((arr1 - np.mean(arr1))/np.std(arr1), (arr2 - np.mean(arr2))/np.std(arr2), 'full') / min(len(arr1), len(arr2))
+    l = correlation_lags(arr1.size, arr2.size,)
+    return c, l

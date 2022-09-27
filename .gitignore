@@ -9,3 +9,6 @@ logs/
 cubetools
 cubtools/*
 music
+*/__pycache__
+*/__pycache__/*
+__pycache__/*
