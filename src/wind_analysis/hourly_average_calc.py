@@ -18,7 +18,7 @@ col_h = {0.33:0, 0.66:1, 1:2, 1.33:3, 2.0:4}
 totals = dict(zip(range(24), np.zeros(24)))
 for day, fps in days.items():
     day = pd.to_datetime(day)
-    if fps['snotel']['Snow Depth (cm) Start of Day Values'] > 33:
+    if fps['snotel']['Snow Depth (cm) Start of Day Values'] > 140:
         if 0.33 in fps.keys() and 2.0 in fps.keys():
             # if day.date() < pd.to_datetime('2022-01-23').date():
             for h, fp in fps.items():
