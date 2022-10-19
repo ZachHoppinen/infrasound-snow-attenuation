@@ -1,10 +1,9 @@
 # Biot's model, by J.B. Johnson, 
 # 
 # iport modules
+from multiprocessing import shared_memory
 import numpy as np
 from scipy import special
-
-
 
 def Johnson2(omega,air,ice,snow):
     """
@@ -148,10 +147,10 @@ def wavenumber(omega,air,ice,snow):
     [rho_f,nu,C_air]=air
     [rho_ice,C_ice]=ice
     [rho_snow,yung,shear,per,d,d_bar,r]=snow
-    
-    
+
+
     # expressions definition, used to "simplify" equations 
-    N= snow[2] 
+    N= snow[2]
     gamma=beta*(air[2]-ice[1])
     kappa=(yung*N)/(9*N-3*snow[1])
     a=(gamma+ice[1]-ice[1]**2*kappa)
@@ -199,9 +198,6 @@ def wavenumber(omega,air,ice,snow):
     return [delta1, delta2, delta3]
 
 
-
-
-    
 def c1(air,ice,snow):
     """
     Compute the velocity of mode 1 neglecting the frequency dependence
