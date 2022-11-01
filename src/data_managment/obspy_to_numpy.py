@@ -13,7 +13,7 @@ from fastparquet import write
 from datetime import datetime
 
 def main():
-    ac_calib = 8.2928e-05
+    ac_calib = 8.2928e-05 #pa/count
     name_dic = {'be4':'lower','a3m':'upper','ad8':'horizontal','ada':'horizontal_2'}
     local_data_dir = '/home/zacharykeskinen/Documents/infrasound/data/banner/infrasound/processed'
     target_dir = '/home/zacharykeskinen/Documents/infrasound/array_data'
